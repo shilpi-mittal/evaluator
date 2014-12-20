@@ -166,6 +166,6 @@ public class evaluator {
 
   public static void main(String[] args) {
     evaluator e = new evaluator();
-    System.out.println(e.evaluateExpression("-8-(-9)+2"));
+    System.out.println(e.evaluateExpression(args[0]));
   }
 }
