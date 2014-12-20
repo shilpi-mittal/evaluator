@@ -17,7 +17,7 @@ This README would normally document whatever steps are necessary to get your app
 ### How do I get set up? ###
 
 * clone the project
-To run the code:
+**To run the code:
 * in command prompt execute cd <project_path>/src/main/java
 * execute javac evaluator.java
 * execute java evaluator <expression_to_evaluate>, for ex: java evaluator 9+(-8)
