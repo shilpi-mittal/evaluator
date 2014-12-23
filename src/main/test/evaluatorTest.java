@@ -50,6 +50,11 @@ public class evaluatorTest {
   }
 
   @Test
+  public void testWhenSpaces() {
+    assert(e.evaluateExpression("  13  +  9  ").equals("22.0"));
+  }
+
+  @Test
   public void testWhenComplexInput() {
     assert(e.evaluateExpression("5*(9+1)*2").equals("100.0"));
     assert(e.evaluateExpression("5*(-9+1)*2").equals("-80.0"));
@@ -71,5 +76,6 @@ public class evaluatorTest {
     assertNull(e.evaluateExpression("9++"));
     assertNull(e.evaluateExpression("9+"));
     assertNull(e.evaluateExpression("-8+-9+2"));
+    assertNull(e.evaluateExpression("1 6 +3"));
   }
 }

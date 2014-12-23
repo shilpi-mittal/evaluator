@@ -7,8 +7,8 @@ public class evaluator {
     input = "(" + input + ")";
     int startIndex, lastIndex;
     String result, inputToEvaluate;
-
-    if (verifyInput(input)) {
+    input = removeSpaces(input);
+    if (input!=null && verifyInput(input)) {
       while (input.contains("(")) {
         startIndex = input.lastIndexOf("(");
         lastIndex = startIndex + input.substring(startIndex).indexOf(")");
@@ -28,10 +28,24 @@ public class evaluator {
           return null;
       }
       return input;
-    } else {
+    }
+    else {
       System.out.println("Invalid input");
       return null;
     }
+  }
+
+  private String removeSpaces(String input) {
+    int indexOfSpace;
+    while (input.contains(" ")) {
+      indexOfSpace = input.indexOf(" ");
+      if(indexOfSpace>0 &&indexOfSpace<input.length()-1) {
+        if(numbers.contains(getStringAt(input,indexOfSpace-1))&&(numbers.contains(getStringAt(input,indexOfSpace+1))))
+          return null;
+      }
+      input = input.substring(0,indexOfSpace) + input.substring(indexOfSpace+1, input.length());
+    }
+    return input;
   }
 
   private boolean verifyInput(String in) {
@@ -161,6 +175,6 @@ public class evaluator {
 
   public static void main(String[] args) {
     evaluator e = new evaluator();
-    System.out.println(e.evaluateExpression(args[0]));
+    System.out.println(e.evaluateExpression("1 6 + 2"));
   }
 }
