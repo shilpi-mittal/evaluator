@@ -13,18 +13,27 @@ public class evaluatorTest {
 
   @Test
   public void testWhenInputBlank() {
-    assert(e.evaluateExpression("").equals(""));
+    assertNull(e.evaluateExpression(""));
   }
 
   @Test
   public void testWhenOnlyParenthesis() {
-    assert(e.evaluateExpression("()").equals(""));
+    assertNull(e.evaluateExpression("()"));
+  }
+
+  @Test
+  public void testWhenNoOperator() {
+    assert(e.evaluateExpression("100").equals("100.0"));
+    assert(e.evaluateExpression("00").equals("0.0"));
+    assert(e.evaluateExpression("-8").equals("-8.0"));
   }
 
   @Test
   public void testWhenUnaryOperators() {
     assert(e.evaluateExpression("-8-9+2").equals("-15.0"));
     assert(e.evaluateExpression("-8-(+9)+2").equals("-15.0"));
+    assert(e.evaluateExpression("-8-9+2").equals("-15.0"));
+    assert(e.evaluateExpression("-8+9-2").equals("-1.0"));
     assert(e.evaluateExpression("-8-(-9)+2").equals("3.0"));
     assert(e.evaluateExpression("-8*(-9)+2").equals("74.0"));
   }
@@ -43,6 +52,7 @@ public class evaluatorTest {
   @Test
   public void testWhenComplexInput() {
     assert(e.evaluateExpression("5*(9+1)*2").equals("100.0"));
+    assert(e.evaluateExpression("5*(-9+1)*2").equals("-80.0"));
   }
 
   @Test

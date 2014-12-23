@@ -1,7 +1,7 @@
 public class evaluator {
 
   String numbers = "0123456789.";
-  String operators = "/*+-";
+  String operators = "/*-+";
 
   public String evaluateExpression(String input) {
     input = "(" + input + ")";
@@ -13,7 +13,7 @@ public class evaluator {
         startIndex = input.lastIndexOf("(");
         lastIndex = startIndex + input.substring(startIndex).indexOf(")");
 
-        if (startIndex > lastIndex || (startIndex > 0 && (numbers+")").contains(getStringAt(input, startIndex - 1)))) {
+        if (startIndex > lastIndex || lastIndex==startIndex+1) {
           System.out.println("Invalid input");
           return null;
         }
@@ -28,8 +28,7 @@ public class evaluator {
           return null;
       }
       return input;
-    }
-    else {
+    } else {
       System.out.println("Invalid input");
       return null;
     }
@@ -38,10 +37,16 @@ public class evaluator {
   private boolean verifyInput(String in) {
     String validInputs = numbers + operators + "()";
     String ch;
+    String previousChar;
     for (int i = 0; i < in.length(); i++) {
       ch = getStringAt(in, i);
-      if (!validInputs.contains(ch)|| (i>0 && operators.contains(ch) && operators.contains(getStringAt(in, i-1))))
+      if (!validInputs.contains(ch))
         return false;
+      if(i>0){
+        previousChar = getStringAt(in, i-1);
+        if((operators.contains(ch) && operators.contains(previousChar)) || (ch.equals("(") && (numbers+")").contains(previousChar)))
+          return false;
+      }
     }
     return true;
   }
@@ -50,12 +55,12 @@ public class evaluator {
     String char1, char2;
     for (int i = 1; i < in.length(); i++) {
       char2 = getStringAt(in, i);
-      char1 = getStringAt(in, i-1);
+      char1 = getStringAt(in, i - 1);
       if (operators.contains(char1) && operators.contains(char2))
-        if(char1.equals("-") && char2.equals("-"))
-          return in.substring(0,i-1)+"+"+in.substring(i+1,in.length());
-        else if(char1.equals("+") && char2.equals("-"))
-          return in.substring(0,i-1)+"-"+in.substring(i+1,in.length());
+        if (char1.equals("-") && char2.equals("-"))
+          return in.substring(0, i - 1) + "+" + in.substring(i + 1, in.length());
+        else if (char1.equals("+") && char2.equals("-"))
+          return in.substring(0, i - 1) + "-" + in.substring(i + 1, in.length());
     }
     return in;
   }
@@ -63,17 +68,18 @@ public class evaluator {
   private String evaluateWithoutParentheses(String input) {
     int operatorIndex;
 
-    for (char operator : operators.toCharArray()) {
-      for (int i = 0; i < input.length(); i++) {
-        if (input.charAt(i) == operator) {
-          operatorIndex = i;
-          input = evaluateSingleOperatorExpression(operator, input, operatorIndex);
-          if(input == null)
-            return null;
-        }
+    for (int i = 0; i < operators.length(); i++) {
+      String operator = getStringAt(operators, i);
+      while (input.substring(1, input.length()).contains(operator)) {
+        operatorIndex = input.substring(1, input.length()).indexOf(operator) + 1;
+        input = evaluateSingleOperatorExpression(operators.charAt(i), input, operatorIndex);
+        if (input == null)
+          return null;
       }
     }
-    return input;
+    int index = getIndexOfFirstOperand(input);
+    float operand = Float.parseFloat(input.substring(index, input.length()));
+    return input.substring(0, index) + operand;
   }
 
   private String evaluateSingleOperatorExpression(char operator, String input, int operatorIndex) {
@@ -83,23 +89,13 @@ public class evaluator {
     String result;
 
     index1 = getIndexOfFirstOperand(input.substring(0, operatorIndex));
-    if (operatorIndex - index1 == 0) {
-      if(operator=='-'||operator=='+')
-        operand1=0;
-      else {
-        System.out.println("Invalid input");
-        return null;
-      }
-    }
-    else {
-      operand1 = Float.parseFloat(input.substring(index1, operatorIndex));
-      if (index1 > 0 && input.charAt(index1 - 1) == '-') {
-        operand1 = -operand1;
-        index1--;
-      } else if (index1 > 0 && input.charAt(operatorIndex - 1) == '+')
-        index1--;
-    }
-    if (operatorIndex+1<input.length() && (input.charAt(operatorIndex + 1) == '-' || input.charAt(operatorIndex + 1) == '+')) {
+    operand1 = Float.parseFloat(input.substring(index1, operatorIndex));
+    if (index1 > 0 && input.charAt(index1 - 1) == '-') {
+      operand1 = -operand1;
+      index1--;
+    } else if (index1 > 0 && input.charAt(operatorIndex - 1) == '+')
+      index1--;
+    if (operatorIndex + 1 < input.length() && (input.charAt(operatorIndex + 1) == '-' || input.charAt(operatorIndex + 1) == '+')) {
       index2 = getIndexOfSecondOperand(input.substring(operatorIndex + 2, input.length()));
       if (index2 == 0) {
         System.out.println("Invalid input");
@@ -109,8 +105,7 @@ public class evaluator {
       operand2 = Float.parseFloat(input.substring(operatorIndex + 2, operatorIndex + index2 + 1));
       if (input.charAt(operatorIndex + 1) == '-')
         operand2 = -operand2;
-    }
-    else {
+    } else {
       index2 = getIndexOfSecondOperand(input.substring(operatorIndex + 1, input.length()));
       if (index2 == 0) {
         System.out.println("Invalid input");
@@ -127,13 +122,13 @@ public class evaluator {
       ans = operand1 / operand2;
     } else if (operator == '*') {
       ans = operand1 * operand2;
-    } else if (operator == '+') {
-      ans = operand1 + operand2;
     } else if (operator == '-') {
       ans = operand1 - operand2;
+    } else if (operator == '+') {
+      ans = operand1 + operand2;
     }
-    ans = (Math.round(ans*100));
-    result = String.valueOf(ans/100);
+    ans = (Math.round(ans * 100));
+    result = String.valueOf(ans / 100);
 
     return input.substring(0, index1) + result + input.substring(operatorIndex + index2 + 1, input.length());
   }
